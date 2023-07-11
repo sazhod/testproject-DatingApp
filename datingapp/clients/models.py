@@ -1,23 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
-from os.path import join
 
-
-def rename_path(instance, filename: str) -> str:
-    """
-    Метод, который отвечает за зменение названия изображения.
-    instance: Client - Объект нашего клиента
-    filename: str - Оригинальный путь к изображению
-    :return -> str
-    """
-    print(type(instance), instance)
-    upload_to = 'static/clients/'
-    ext = filename.split('.')[-1]
-
-    if instance.pk:
-        filename = f'{instance.pk}.{ext}'
-
-    return f'{upload_to}{filename}'
+from .utils import (rename_path, adding_watermark, DEFAULT_CLIENT_IMAGE_PATH)
 
 
 class Client(models.Model):
@@ -36,7 +20,13 @@ class Client(models.Model):
 
     user = models.OneToOneField(to=User, on_delete=models.CASCADE)
     gender = models.CharField(verbose_name='Пол', max_length=1, choices=GENDERS, default='М')
-    image = models.ImageField(verbose_name='Аватар', upload_to=rename_path, blank=True)
+    image = models.ImageField(verbose_name='Аватар', upload_to=rename_path, blank=True,
+                              default=r"static/clients/images/default.png")
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        if self.image.path != DEFAULT_CLIENT_IMAGE_PATH:
+            adding_watermark(self.image.path)
 
     def __str__(self):
         return f'{self.user.last_name} {self.user.first_name}'
