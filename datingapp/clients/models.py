@@ -30,3 +30,22 @@ class Client(models.Model):
 
     def __str__(self):
         return f'{self.user.last_name} {self.user.first_name}'
+
+
+class Likes(models.Model):
+    """
+    Модель, которая описывает симпатии клиентов
+    """
+    class Meta:
+        ordering = ['id']
+        verbose_name = 'Симпатия'
+        verbose_name_plural = 'Симпатии'
+
+    from_client = models.ForeignKey(to=Client, on_delete=models.CASCADE, verbose_name='От клиента',
+                                    related_name='from_client')
+    to_client = models.ForeignKey(to=Client, on_delete=models.CASCADE, verbose_name='К клиента',
+                                  related_name='to_client')
+
+    def __str__(self):
+        return f'Симпатия {self.from_client} к {self.to_client}'
+

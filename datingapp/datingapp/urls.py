@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.urls import path, include
 
-from clients.views import ClientViewSet
+from clients.views import ClientViewSet, LoginUser
 from clients.yasg import urlpatterns as doc_urls
 
 from rest_framework import routers
@@ -13,5 +13,9 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/clients/', ClientViewSet.as_view({'get': 'list'})),
     path('api/clients/create', ClientViewSet.as_view({'post': 'create'})),
+    path('api/clients/<int:pk>/mathc', ClientViewSet.as_view({'post': 'likes'})),
+    path('login/', LoginUser.as_view())
     # path('api/', include(router.urls))
 ] + doc_urls
+
+# Password123!@#
