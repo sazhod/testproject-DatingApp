@@ -22,11 +22,20 @@ class Client(models.Model):
     gender = models.CharField(verbose_name='Пол', max_length=1, choices=GENDERS, default='М')
     image = models.ImageField(verbose_name='Аватар', upload_to=rename_path, blank=True,
                               default=r"static/clients/images/default.png")
+    longitude = models.DecimalField(verbose_name='Долгота', default=0.0, max_digits=9, decimal_places=6)
+    latitude = models.DecimalField(verbose_name='Широта', default=0.0, max_digits=9, decimal_places=6)
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
         if self.image.path != DEFAULT_CLIENT_IMAGE_PATH:
             adding_watermark(self.image.path)
+
+    def get_point(self):
+        """
+        Метод возвращает Tuple[долгота, широта] клиента
+        :return: tuple[float, float]
+        """
+        return self.longitude, self.latitude
 
     def __str__(self):
         return f'{self.user.last_name} {self.user.first_name}'

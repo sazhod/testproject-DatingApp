@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
 from .models import Client
+from .utils import get_distance_in_meters
 
 
 class UserSerializer(serializers.ModelSerializer):

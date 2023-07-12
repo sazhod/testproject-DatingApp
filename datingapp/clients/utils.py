@@ -1,4 +1,7 @@
+from typing import Tuple
 from PIL import Image
+from geopy.distance import great_circle
+
 from django.conf import settings
 from django.core.mail import EmailMessage, get_connection
 
@@ -43,6 +46,16 @@ def send_email(from_client, to_client):
         recipient_list = [to_client.user.email, ]
         message = f'Вы понравились "{from_client}"!\nПочта участника: "{from_client.user.email}"'
         EmailMessage(subject, message, email_from, recipient_list, connection=connection).send()
+
+
+def get_distance_in_meters(point1: Tuple[float, float], point2: Tuple[float, float]) -> float:
+    """
+    Метод получает позиции клиентов и возвращает расстояние между ними в метрах
+    :param point1: Tuple[float, float] - Позиция первого клиента
+    :param point2: Tuple[float, float] - Позиция второго клиента клиента
+    :return: -> float - Расстояние между клиентами в метрах
+    """
+    return great_circle(point1, point2).meters
 
 
 # Path to default.png.

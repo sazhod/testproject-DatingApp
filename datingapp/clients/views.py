@@ -11,6 +11,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import permission_classes, action
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 
+from .filters import ClientFilterSet
 from .models import Client, Likes
 from .serializers import ClientSerializer, UserSerializer
 from .utils import send_email
@@ -24,9 +25,9 @@ class ClientListAPIView(generics.ListAPIView):
     """
     queryset = Client.objects.all()
     serializer_class = ClientSerializer
-    filter_backends = [filters.DjangoFilterBackend]
-    filterset_fields = ['gender', 'user__last_name', 'user__first_name']
-
+    permission_classes = (IsAuthenticated,)
+    filter_backends = (filters.DjangoFilterBackend,)
+    filterset_class = ClientFilterSet
 
 class ClientViewSet(viewsets.ViewSet):
     """
