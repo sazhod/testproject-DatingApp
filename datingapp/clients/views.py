@@ -1,15 +1,14 @@
-from typing import Any
-
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.models import User
 from django.contrib.auth.views import LoginView
 from django.shortcuts import render
 
 from drf_yasg.utils import swagger_auto_schema
+from django_filters import rest_framework as filters
 
-from rest_framework import viewsets
+from rest_framework import viewsets, generics
 from rest_framework.response import Response
-from rest_framework.decorators import permission_classes
+from rest_framework.decorators import permission_classes, action
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 
 from .models import Client, Likes
@@ -17,20 +16,22 @@ from .serializers import ClientSerializer, UserSerializer
 from .utils import send_email
 
 
+class ClientListAPIView(generics.ListAPIView):
+    """
+    api/list/
+    Класс который отвечает за отображение клиентов с учетом фильтрации по полям:
+    gender, last_name, first_name
+    """
+    queryset = Client.objects.all()
+    serializer_class = ClientSerializer
+    filter_backends = [filters.DjangoFilterBackend]
+    filterset_fields = ['gender', 'user__last_name', 'user__first_name']
+
+
 class ClientViewSet(viewsets.ViewSet):
     """
-    Класс, в которм реализована логика всех запросов связанных с клиентами.
+    Класс, в которм реализована логика создания и симпатий клиентов.
     """
-    @swagger_auto_schema(responses={200: ClientSerializer(many=True)})
-    def list(self, request: Any) -> Response:
-        """
-        api/clients/
-        Возвращает информацию о всех клиентах
-        """
-        queryset = Client.objects.all()
-        serializer = ClientSerializer(queryset, many=True)
-        return Response(serializer.data)
-
     @swagger_auto_schema(request_body=ClientSerializer)
     def create(self, request):
         """
